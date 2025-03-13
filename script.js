@@ -81,13 +81,53 @@
         `;
     };
 
+    const buildCarouselHTML = (products) => {
+        const carouselHTML = `
+            <div class="carousel">
+                <h2 class="carousel-title">You Might Also Like</h2>
+                <div class="carousel-container">
+                    <button class="carousel-nav prev">❮</button>
+                    <div class="carousel-track">
+                        ${products.map(product => `
+                            <div class="carousel-item">
+                                <div class="product-card">
+                                    <div class="card-image">
+                                        <a href="${product.url}" target="_blank">
+                                            <img src="${product.img}" alt="${product.name}">
+                                        </a>
+                                        <button class="favorite" data-id="${product.id}">
+                                            <svg viewBox="0 0 24 24">
+                                                <path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="card-info">
+                                        <h3 class="card-title">${product.name}</h3>
+                                        <div class="card-price">${product.price} TL</div>
+                                    </div>
+                                </div>
+                            </div>
+                        `).join('')}
+                    </div>
+                    <button class="carousel-nav next">❯</button>
+                </div>
+            </div>
+        `;
+
+        $('.product-detail').after(carouselHTML);
+        /*
+        setEvents();
+        */
+    };
+
     
     const buildCSS = () => {
         const css = `
-            .body {
+            body {
                 max-width: 1200px;
                 margin: 0 auto;
                 padding: 20px;
+                background: #fdfdfd;
                 font-family: 'Helvetica Neue', Arial, sans-serif;
             }
 
@@ -97,8 +137,8 @@
                 grid-template-columns: 1fr 1fr;
                 gap: 40px;
                 margin-bottom: 60px;
+                max-height: 120vh;
             }
-
 
             .main-image {
                 margin-bottom: 20px;
@@ -109,10 +149,10 @@
 
             .main-image img {
                 width: 100%;
-                max-width: 70%;
-                max-height: 70%;
+                max-height: 80%;
                 height: auto;
                 display: block;
+                border-radius: 8px;
             }
 
             .product-info {
@@ -233,9 +273,168 @@
             .add-cart-btn:hover {
                 background: #0052a3;
             }
+
+            /* Carousel Styles */
+            carousel {
+                margin-top: 40px;
+            }
+
+            .carousel-title {
+                text-align: center;
+                font-size: 24px;
+                margin-bottom: 30px;
+                color: #333;
+            }
+
+            .carousel-container {
+                position: relative;
+                padding: 0 40px;
+                margin: 0 auto;
+                margin-bottom: 50px;
+                max-width: 1200px;
+                overflow: hidden;
+            }
+
+            .carousel-track {
+                display: flex;
+                gap: 20px;
+                transition: transform 0.3s ease-in-out;
+                width: 100%;
+            }
+
+            .carousel-item {
+                width: 20%;
+                min-width: 200px;
+                max-width: 250px;
+            }
+
+            .product-card {
+                height: 100%;
+                display: flex;
+                flex-direction: column;
+                background: white;
+                border-radius: 8px;
+                box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+                overflow: hidden;
+            }
+
+            .card-image {
+                position: relative;
+                overflow: hidden;
+            }
+
+            .card-image img {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+                object-fit: cover;
+            }
+
+            .card-info {
+                padding: 15px;
+                flex: 1;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+            }
+
+            .card-title {
+                font-size: 14px;
+                margin: 0 0 10px;
+                color: #333;
+                display: -webkit-box;
+                -webkit-line-clamp: 2;
+                -webkit-box-orient: vertical;
+                overflow: hidden;
+                height: 40px;
+            }
+
+            .card-price {
+                font-size: 16px;
+                font-weight: bold;
+                color: #0066cc;
+            }
+
+            .favorite {
+                position: absolute;
+                top: 10px;
+                right: 10px;
+                width: 32px;
+                height: 32px;
+                border: none;
+                background: white;
+                border-radius: 50%;
+                cursor: pointer;
+                padding: 6px;
+                box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+                z-index: 2;
+                transition: all 0.3s ease;
+            }
+
+            .favorite:hover {
+                transform: scale(1.1);
+            }
+
+            .favorite svg {
+                width: 100%;
+                height: 100%;
+                fill: #ddd;
+                transition: fill 0.3s ease;
+            }
+
+            .favorite.active svg {
+                fill: #0066cc;
+            }
+
+            .card-image {
+                position: relative;
+                padding-top: 133%;
+                overflow: hidden;
+            }
+
+            .card-image a {
+                position: absolute;
+                top: 0;
+                left: 0;
+                width: 100%;
+                height: 100%;
+            }
+
+            .carousel-nav {
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                width: 40px;
+                height: 40px;
+                background: white;
+                border: 1px solid #ddd;
+                border-radius: 50%;
+                cursor: pointer;
+                z-index: 2;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                transition: all 0.3s ease;
+            }
+
+            .carousel-nav.disabled {
+                opacity: 0.5;
+                cursor: not-allowed;
+            }
+
+            .carousel-nav:not(.disabled):hover {
+                background: #0066cc;
+                color: white;
+                border-color: #0066cc;
+            }
+
+            .prev { left: 0; }
+            .next { right: 0; }
         `;
 
-        $('<style>').addClass('lcw-carousel-style').html(css).appendTo('head');
+        $('<style>').addClass('carousel-style').html(css).appendTo('head');
     };
 
     /*
@@ -252,8 +451,9 @@
         let storedProducts = localStorage.getItem(settings.STORAGE_KEYS.PRODUCTS);
 
         if (storedProducts) {
-            let parsedData = JSON.parse(storedProducts);
-            console.log("Data came form localStorage", parsedData);
+            let products = JSON.parse(storedProducts);
+            console.log("Data came form localStorage", products);
+            buildCarouselHTML(products);
         } else {
             $.ajax({
                 url: settings.API_URL,
@@ -262,6 +462,7 @@
                 success: (data) => {
                     console.log("Products fetched from API:", data);
                     localStorage.setItem(settings.STORAGE_KEYS.PRODUCTS, JSON.stringify(data));
+                    buildCarouselHTML(data);
                 },
                 error: (jqXHR, textStatus, errorThrown) => {
                     console.error("Could not fetch product list:", textStatus, errorThrown);
