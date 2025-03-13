@@ -20,9 +20,7 @@
     const init = () => {
         buildHTML();
         buildCSS();
-        /*
         setEvents();
-        */
         fetchProducts();
     };
 
@@ -115,9 +113,7 @@
         `;
 
         $('.product-detail').after(carouselHTML);
-        /*
         setEvents();
-        */
     };
 
     
@@ -348,7 +344,8 @@
                 -webkit-line-clamp: 2;
                 -webkit-box-orient: vertical;
                 overflow: hidden;
-                height: 40px;
+                line-height: 20px;
+                max-height: 40px;
             }
 
             .card-price {
@@ -437,16 +434,6 @@
         $('<style>').addClass('carousel-style').html(css).appendTo('head');
     };
 
-    /*
-
-    const setEvents = () => {
-        $('').on('click', () => {
-            console.log('clicked');
-        });
-    };
-
-    */
-
     const fetchProducts = () => {
         let storedProducts = localStorage.getItem(settings.STORAGE_KEYS.PRODUCTS);
 
@@ -469,6 +456,39 @@
                 }
             });
         }
+    };
+
+    const handleFavoriteEvents = () => {
+        const favorites = new Set(JSON.parse(localStorage.getItem(settings.STORAGE_KEYS.FAVORITES) || '[]'));
+
+        $('.favorite').each(function() {
+            const productId = $(this).data('id');
+            if (favorites.has(productId)) {
+                $(this).addClass('active');
+            }
+        });
+
+        $('.favorite').on('click', function(e) {
+            e.preventDefault();
+            e.stopPropagation();
+            
+            const $btn = $(this);
+            const productId = $btn.data('id');
+
+            if (favorites.has(productId)) {
+                favorites.delete(productId);
+                $btn.removeClass('active');
+            } else {
+                favorites.add(productId);
+                $btn.addClass('active');
+            }
+
+            localStorage.setItem(settings.STORAGE_KEYS.FAVORITES, JSON.stringify([...favorites]));
+        });
+    };
+
+    const setEvents = () => {
+        handleFavoriteEvents();
     };
 
     const ensureJQuery = (callback) => {
