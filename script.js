@@ -302,6 +302,7 @@
                 width: 20%;
                 min-width: 200px;
                 max-width: 250px;
+                cursor: pointer;
             }
 
             .product-card {
@@ -458,6 +459,67 @@
         }
     };
 
+    const handleCarouselEvents = () => {
+        let currentIndex = 0;
+        const $track = $('.carousel-track');
+        const $items = $('.carousel-item');
+        const $prev = $('.prev');
+        const $next = $('.next');
+
+        $('.carousel-item').on('click', function(e) {
+            if (!$(e.target).closest('.favorite').length) {
+                const url = $(this).find('a').attr('href');
+                if (url) {
+                    window.open(url, '_blank');
+                }
+            }
+        });
+
+        const updateCarousel = () => {
+            const containerWidth = $('.carousel-container').width();
+            let itemsPerView;
+            
+            if (containerWidth >= 1200) itemsPerView = 6;
+            else if (containerWidth >= 992) itemsPerView = 5;
+            else if (containerWidth >= 768) itemsPerView = 4;
+            else if (containerWidth >= 576) itemsPerView = 3;
+            else itemsPerView = 2;
+
+            const totalSlides = Math.ceil($items.length / itemsPerView);
+            const itemWidth = containerWidth / itemsPerView;
+            
+            const translateX = currentIndex * (itemWidth * itemsPerView);
+            $track.css('transform', `translateX(-${translateX}px)`);
+
+            $prev.toggleClass('disabled', currentIndex <= 0);
+            $next.toggleClass('disabled', currentIndex >= totalSlides - 1);
+        };
+
+        $next.on('click', () => {
+            if (!$next.hasClass('disabled')) {
+                currentIndex++;
+                updateCarousel();
+            }
+        });
+
+        $prev.on('click', () => {
+            if (!$prev.hasClass('disabled')) {
+                currentIndex--;
+                updateCarousel();
+            }
+        });
+
+
+        // Resets the carousel to the first item and updates it after a 250ms debounce on window resize.
+        $(window).on('resize', debounce(() => {
+            currentIndex = 0;
+            updateCarousel();
+        }, 250));
+
+        updateCarousel();
+    };
+
+
     const handleFavoriteEvents = () => {
         const favorites = new Set(JSON.parse(localStorage.getItem(settings.STORAGE_KEYS.FAVORITES) || '[]'));
 
@@ -487,7 +549,20 @@
         });
     };
 
+    const debounce = (func, wait) => {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    };
+
     const setEvents = () => {
+        handleCarouselEvents();
         handleFavoriteEvents();
     };
 
